@@ -391,6 +391,14 @@
 
 <script src="https://unpkg.com/leaflet@1.9/dist/leaflet.js"></script>
 <script>
+// I poster restano sul Pi (mai committati su Pages: altrimenti ogni evento richiede
+// un commit git e la history dei binari cresce per sempre). Vengono serviti live via
+// Funnel dallo stesso server pubblico del submit (porta 8091). Se il Pi e' spento le
+// immagini non caricano, ma il resto del sito (statico) continua a funzionare.
+// RUNBOOK §5: valorizzare con l'URL Funnel quando noto.
+const POSTER_BASE = (location.hostname==="localhost"||location.hostname==="127.0.0.1")
+  ? "http://127.0.0.1:8091" : "https://SOSTITUISCI-CON-URL-FUNNEL.ts.net";
+
 // ---- icone SVG (niente emoji: rendering incoerente tra piattaforme) ----
 const ICON_PATHS = {
   mail:'<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/>',
@@ -532,7 +540,7 @@ function cardEl(e,slot){
   el.className="card"; el.type="button";
   el.dataset.eventId=e.id;
   const posterSm = e.poster_thumb
-    ? `<img class="poster-sm" src="posters/${esc(e.poster_thumb)}" alt="">`
+    ? `<img class="poster-sm" src="${POSTER_BASE}/posters/${esc(e.poster_thumb)}" alt="">`
     : `<div class="poster-sm ph">n/d</div>`;
   const FOOD_LABEL={rinfresco:"Rinfresco",bar:"Bar",cucina:"Cucina"};
   const foodBadges = (e.food||[]).map(f=>`<span class="b food">${FOOD_LABEL[f]||f}</span>`).join("");
@@ -576,7 +584,7 @@ function mapsUrl(e){
 
 function openModal(e){
   const poster = e.poster
-    ? `<img class="modal-poster" src="posters/${esc(e.poster)}" alt="Locandina">`
+    ? `<img class="modal-poster" src="${POSTER_BASE}/posters/${esc(e.poster)}" alt="Locandina">`
     : `<div class="modal-poster ph">senza locandina</div>`;
   const FOOD_LABEL={rinfresco:"Rinfresco",bar:"Bar",cucina:"Cucina"};
   const foodBadges = (e.food||[]).map(f=>`<span class="b food">${FOOD_LABEL[f]||f}</span>`).join("");
