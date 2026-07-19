@@ -330,6 +330,9 @@ async function runPlaceSearch(q){
     const r=await fetch(url,{signal:placeSearchAbort.signal, headers:{"Accept-Language":"it"}});
     if(r.ok) results=await r.json();
   }catch(_){ return; }   // abort di una ricerca superata, o rete assente: silenzioso
+  // niente strade: un evento si tiene in un luogo (piazza, edificio, locale...), non
+  // lungo un'intera via. Nominatim marca le vie con category "highway".
+  results=results.filter(r=>r.category!=="highway" && r.addresstype!=="road");
   // dedupe: Nominatim spesso restituisce lo stesso posto come piu' oggetti OSM
   // distinti (via + nodo + area) con lo stesso display_name.
   const seen=new Set();

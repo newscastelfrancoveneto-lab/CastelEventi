@@ -536,6 +536,7 @@ async function runPlaceSearch(q){
     const r=await fetch(url,{signal:placeSearchAbort.signal, headers:{"Accept-Language":"it"}});
     if(r.ok) results=await r.json();
   }catch(_){ return; }
+  results=results.filter(r=>r.category!=="highway" && r.addresstype!=="road");
   const seen=new Set();
   results=results.filter(r=>{
     const key=r.display_name+"|"+r.lat+"|"+r.lon;
