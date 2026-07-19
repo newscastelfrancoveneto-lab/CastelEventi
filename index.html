@@ -391,13 +391,15 @@
 
 <script src="https://unpkg.com/leaflet@1.9/dist/leaflet.js"></script>
 <script>
-// I poster restano sul Pi (mai committati su Pages: altrimenti ogni evento richiede
-// un commit git e la history dei binari cresce per sempre). Vengono serviti live via
-// Funnel dallo stesso server pubblico del submit (porta 8091). Se il Pi e' spento le
-// immagini non caricano, ma il resto del sito (statico) continua a funzionare.
+// Dati (events.json, weather.json, poster) NON sono committati su Pages: solo la shell
+// (index.html/submit.html/admin.html) e' statica. Tutto il resto viene letto live dal
+// Pi via Funnel [decisione proprietario], stesso server pubblico del submit (8091).
+// Conseguenza accettata: se il Pi e' spento, il sito carica ma non mostra eventi/meteo
+// finche' non torna su (non e' piu' un semplice "le immagini non caricano").
 // RUNBOOK §5: valorizzare con l'URL Funnel quando noto.
-const POSTER_BASE = (location.hostname==="localhost"||location.hostname==="127.0.0.1")
+const PI_BASE = (location.hostname==="localhost"||location.hostname==="127.0.0.1")
   ? "http://127.0.0.1:8091" : "https://SOSTITUISCI-CON-URL-FUNNEL.ts.net";
+const POSTER_BASE = PI_BASE;
 
 // ---- icone SVG (niente emoji: rendering incoerente tra piattaforme) ----
 const ICON_PATHS = {
@@ -953,7 +955,7 @@ function weatherIconSvg(category, isNight){
 async function loadWeather(){
   const bar=document.getElementById("weather-bar");
   try{
-    const r=await fetch("./weather.json",{cache:"no-store"});
+    const r=await fetch(PI_BASE+"/weather.json",{cache:"no-store"});
     if(!r.ok) return;
     const data=await r.json();
     const w=data.weather[0];
@@ -982,7 +984,7 @@ async function loadWeather(){
 // carica events.json se presente, altrimenti fallback
 (async()=>{
   try{
-    const r=await fetch("./events.json",{cache:"no-store"});
+    const r=await fetch(PI_BASE+"/events.json",{cache:"no-store"});
     if(r.ok){ DATA=await r.json(); }
   }catch(_){/* anteprima: usa FALLBACK */}
   render();

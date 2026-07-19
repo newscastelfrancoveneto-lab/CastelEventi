@@ -266,7 +266,7 @@ function initMap(){
 }
 (async()=>{
   try{
-    const r=await fetch("./events.json",{cache:"no-store"});
+    const r=await fetch(SUBMIT_API_BASE+"/events.json",{cache:"no-store"});
     if(r.ok){ const d=await r.json(); if(d.town_bbox) TOWN_BBOX=d.town_bbox; }
   }catch(_){}
   initMap();
