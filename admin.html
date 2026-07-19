@@ -134,6 +134,16 @@
   .modal-cancel{font:inherit;font-size:13px;background:none;border:none;color:var(--ink-soft);cursor:pointer}
   .modal-err{color:var(--danger);font-size:13px;margin-bottom:10px;display:none}
   .modal-err.show{display:block}
+  .place-results{position:absolute;top:100%;left:0;right:0;z-index:30;background:#fff;
+    border:1.5px solid var(--line);border-top:none;border-radius:0 0 3px 3px;max-height:220px;
+    overflow-y:auto;display:none}
+  .place-results.show{display:block}
+  .place-result{padding:8px 11px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--line)}
+  .place-result:last-child{border-bottom:none}
+  .place-result:hover{background:#fdf3f0}
+  .place-result b{display:block;font-size:14px}
+  .place-result span{color:var(--ink-soft);font-size:12px}
+  .place-empty{padding:8px 11px;font-size:13px;color:var(--ink-soft)}
 
   /* ---------- login ---------- */
   #login{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
@@ -211,6 +221,11 @@
         <button type="button" class="addslot" id="addslot">+ aggiungi giorno/orario</button>
       </div>
 
+      <div class="field" style="position:relative">
+        <label>Cerca il luogo</label>
+        <input id="place-search" placeholder="es. Piazza Giorgione" autocomplete="off">
+        <div id="place-results" class="place-results"></div>
+      </div>
       <div class="field"><label>Luogo</label><input name="venue_name" required></div>
       <div class="field"><label>Ambiente</label>
         <select name="venue_type" required>
@@ -488,6 +503,59 @@ function slotRow(start="",end=""){
   });
   return row;
 }
+// ---- ricerca luogo: geocoding OSM (Nominatim). Riempie luogo/indirizzo/coordinate,
+// tutto resta modificabile a mano dopo. Stesso bbox di casteleventi.TOWN_BBOX. ----
+const TOWN_BBOX=[45.650,11.905,45.690,11.950];
+const placeSearchInput=document.getElementById("place-search");
+const placeResultsEl=document.getElementById("place-results");
+let placeSearchTimer=null, placeSearchAbort=null;
+
+function hidePlaceResults(){ placeResultsEl.classList.remove("show"); placeResultsEl.innerHTML=""; }
+
+async function runPlaceSearch(q){
+  if(placeSearchAbort) placeSearchAbort.abort();
+  placeSearchAbort=new AbortController();
+  const [minlat,minlon,maxlat,maxlon]=TOWN_BBOX;
+  const url=`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6`
+    +`&viewbox=${minlon},${maxlat},${maxlon},${minlat}&bounded=1&q=${encodeURIComponent(q)}`;
+  let results=[];
+  try{
+    const r=await fetch(url,{signal:placeSearchAbort.signal, headers:{"Accept-Language":"it"}});
+    if(r.ok) results=await r.json();
+  }catch(_){ return; }
+  if(!results.length){
+    placeResultsEl.innerHTML=`<div class="place-empty">Nessun risultato</div>`;
+    placeResultsEl.classList.add("show");
+    return;
+  }
+  placeResultsEl.innerHTML=results.map((r,i)=>
+    `<div class="place-result" data-i="${i}"><b>${esc(r.display_name.split(",")[0])}</b>`
+    +`<span>${esc(r.display_name)}</span></div>`).join("");
+  placeResultsEl.classList.add("show");
+  placeResultsEl.querySelectorAll(".place-result").forEach(el=>{
+    el.addEventListener("click",()=>choosePlace(results[+el.dataset.i]));
+  });
+}
+
+function choosePlace(r){
+  newform.elements.venue_name.value=r.display_name.split(",")[0];
+  newform.elements.address.value=r.display_name;
+  newform.elements.lat.value=parseFloat(r.lat).toFixed(6);
+  newform.elements.lon.value=parseFloat(r.lon).toFixed(6);
+  placeSearchInput.value="";
+  hidePlaceResults();
+}
+
+placeSearchInput.addEventListener("input",()=>{
+  clearTimeout(placeSearchTimer);
+  const q=placeSearchInput.value.trim();
+  if(q.length<3){ hidePlaceResults(); return; }
+  placeSearchTimer=setTimeout(()=>runPlaceSearch(q), 400);
+});
+document.addEventListener("click",e=>{
+  if(!e.target.closest("#place-search") && !e.target.closest("#place-results")) hidePlaceResults();
+});
+
 const contactsEl=document.getElementById("contacts");
 function contactRow(type="telefono",value=""){
   const row=document.createElement("div"); row.className="contact-row";
