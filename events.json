@@ -1,0 +1,193 @@
+{
+  "generated_at": "2026-07-19T10:25:17+02:00",
+  "town_bbox": [
+    45.65,
+    11.905,
+    45.69,
+    11.95
+  ],
+  "events": [
+    {
+      "id": "0be7be488de23729",
+      "title": "Sagra San Liberale",
+      "categories": [
+        "sagra"
+      ],
+      "slots": [
+        {
+          "start": "2026-07-18T18:48",
+          "end": "2026-08-07T18:48"
+        }
+      ],
+      "venue_name": "Palazzetto dello Sport",
+      "venue_type": "both",
+      "lat": 45.671777,
+      "lon": 11.921632,
+      "address": "Piazza Donatori del sangue",
+      "poster": "5df015a957a87c45f9b8983f1835c6dbc73cc9d226b04dc10a7df6b56b4ac00c.webp",
+      "poster_thumb": "5df015a957a87c45f9b8983f1835c6dbc73cc9d226b04dc10a7df6b56b4ac00c_thumb.webp",
+      "cost": null,
+      "is_free": true,
+      "food": [
+        "cucina"
+      ],
+      "food_note": "Grigliata",
+      "discounts": [],
+      "description": "Cibo, musica e torneo",
+      "contacts": [
+        {
+          "type": "telefono",
+          "value": "333 444 5555"
+        }
+      ],
+      "status": "published",
+      "published_at": "2026-07-18T18:50:40+02:00"
+    },
+    {
+      "id": "1dfa4b20fffd3489",
+      "title": "La vita seconda. Quattro libri sulla felicità",
+      "categories": [
+        "cultura"
+      ],
+      "slots": [
+        {
+          "start": "2026-07-27T20:45",
+          "end": "2026-07-27T23:00"
+        }
+      ],
+      "venue_name": "Biblioteca comunale",
+      "venue_type": "indoor",
+      "lat": 45.67,
+      "lon": 11.9275,
+      "address": "Piazza San Liberale",
+      "poster": "e99f8d326078ad93925c533e1de0c540dce58b9ad3c313727b8ea87a080a63f2.webp",
+      "poster_thumb": "e99f8d326078ad93925c533e1de0c540dce58b9ad3c313727b8ea87a080a63f2_thumb.webp",
+      "cost": null,
+      "is_free": true,
+      "food": [],
+      "food_note": null,
+      "discounts": [],
+      "description": "Per la rassegna letteraria La vita seconda, lunedì 27 luglio alle ore 20:45  Vito Di Battista presenta Dove cadono le comete (Feltrinelli, 2025).\nIn dialogo con Michela Fregona.\n\nIn un paese dell’Abruzzo che si trova sulla linea del fronte e della Storia, un romanzo corale che parla del significato del farsi comunità e delle scelte di una generazione che si trovò impigliata nella guerra.",
+      "contacts": [
+        {
+          "type": "telefono",
+          "value": "+39 0423 735 690"
+        },
+        {
+          "type": "email",
+          "value": "info@bibliotecacastelfrancoveneto.tv.it"
+        }
+      ],
+      "status": "published",
+      "published_at": "2026-07-19T01:27:51+02:00"
+    },
+    {
+      "id": "74b9bb40aa5acd58",
+      "title": "Concertone",
+      "categories": [
+        "concerto"
+      ],
+      "slots": [
+        {
+          "start": "2026-07-18T13:00",
+          "end": "2026-07-18T19:00"
+        },
+        {
+          "start": "2026-07-19T12:00",
+          "end": "2026-07-19T23:00"
+        }
+      ],
+      "venue_name": "Piazza Giorgione",
+      "venue_type": "outdoor",
+      "lat": 45.672953,
+      "lon": 11.925414,
+      "address": "Piazza Giorgione 1",
+      "poster": null,
+      "poster_thumb": null,
+      "cost": null,
+      "is_free": true,
+      "food": [
+        "bar"
+      ],
+      "food_note": null,
+      "discounts": [],
+      "description": "Concerto jazz",
+      "contacts": [
+        {
+          "type": "telefono",
+          "value": "49484994948489"
+        }
+      ],
+      "status": "published",
+      "published_at": "2026-07-18T19:02:07+02:00"
+    },
+    {
+      "id": "b8acd9bb492d597a",
+      "title": "La vita seconda. Quattro libri sulla felicità",
+      "categories": [
+        "cultura"
+      ],
+      "slots": [
+        {
+          "start": "2026-07-24T20:45",
+          "end": "2026-07-24T23:00"
+        }
+      ],
+      "venue_name": "Biblioteca comunale",
+      "venue_type": "indoor",
+      "lat": 45.670797,
+      "lon": 11.926496,
+      "address": "Piazza San Liberale",
+      "poster": "e99f8d326078ad93925c533e1de0c540dce58b9ad3c313727b8ea87a080a63f2.webp",
+      "poster_thumb": "e99f8d326078ad93925c533e1de0c540dce58b9ad3c313727b8ea87a080a63f2_thumb.webp",
+      "cost": null,
+      "is_free": true,
+      "food": [],
+      "food_note": null,
+      "discounts": [],
+      "description": "Per la rassegna letteraria La vita seconda, venerdì 24 luglio alle ore 20:45  Laura Pariani presenta Primamà (La nave di Teseo, 2025).\nIn dialogo con Michela Fregona.\n\nUn romanzo sulle origini della bellezza e della violenza, della resistenza e della tenerezza: che parla alla nostra contemporaneità con il linguaggio della parola più antica (quella del mito, della fiaba, del racconto ancestrale).",
+      "contacts": [
+        {
+          "type": "email",
+          "value": "info@bibliotecacastelfrancoveneto.tv.it"
+        }
+      ],
+      "status": "published",
+      "published_at": "2026-07-18T20:21:13+02:00"
+    },
+    {
+      "id": "ebde32641f1f0736",
+      "title": "La vita seconda. Quattro libri sulla felicità",
+      "categories": [
+        "cultura"
+      ],
+      "slots": [
+        {
+          "start": "2026-07-23T20:45",
+          "end": "2026-07-23T23:00"
+        }
+      ],
+      "venue_name": "Biblioteca comunale",
+      "venue_type": "indoor",
+      "lat": 45.670797,
+      "lon": 11.926496,
+      "address": "Piazza San Liberale, 31033 Castelfranco Veneto (TV)",
+      "poster": "e99f8d326078ad93925c533e1de0c540dce58b9ad3c313727b8ea87a080a63f2.webp",
+      "poster_thumb": "e99f8d326078ad93925c533e1de0c540dce58b9ad3c313727b8ea87a080a63f2_thumb.webp",
+      "cost": null,
+      "is_free": true,
+      "food": [],
+      "food_note": null,
+      "discounts": [],
+      "description": "Per la rassegna letteraria La vita seconda, giovedì 23 luglio alle ore 20:45  Giulia Baldelli presenta Un mondo soltanto (NN Editore, 2026).\nIn dialogo con Michela Fregona.\n\nL’amicizia che salda, costruisce e poi si perde: può essere ancora, il legame con le amiche che la vita ha lasciato indietro, il luogo al quale tornare quando tutto sta per finire perduto?\nUn romanzo di formazione, sformazione, ricostruzione: c’è il tradimento di un uomo, nel presente di Tessa. Ma quello che oggi deve attraversare è forse solo una tappa (la più estrema) di qualcosa che non è stato mai davvero affrontato.",
+      "contacts": [
+        {
+          "type": "email",
+          "value": "info@bibliotecacastelfrancoveneto.tv.it"
+        }
+      ],
+      "status": "published",
+      "published_at": "2026-07-18T19:57:14+02:00"
+    }
+  ]
+}
