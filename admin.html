@@ -47,7 +47,7 @@
   .poster-sm{width:52px;height:52px;object-fit:cover;border-radius:3px;background:#e7e0d0}
   .poster-sm.ph{display:flex;align-items:center;justify-content:center;color:var(--ink-soft);
     font-size:8px;text-align:center}
-  .poster{width:96px;height:128px;object-fit:cover;border-radius:3px;background:#e7e0d0}
+  .poster{width:96px;height:128px;object-fit:cover;border-radius:3px;background:#e7e0d0;cursor:pointer;display:block}
   .poster.ph{display:flex;align-items:center;justify-content:center;color:var(--ink-soft);
     font-size:11px;text-align:center;padding:6px}
   .ev h3{font-family:ui-serif,Georgia,serif;font-size:19px;margin:0 0 3px;letter-spacing:-.01em}
@@ -91,8 +91,6 @@
   @media(max-width:520px){
     .ev{grid-template-columns:1fr}.poster{width:100%;height:160px}
     .field-row{flex-direction:column;gap:14px}
-    .slot-row{flex-wrap:wrap}
-    .slot-row input{flex:1 1 100%}
     .contact-row{flex-wrap:wrap}
     .contact-row select,.contact-row input{flex:1 1 100%}
     .wrap{padding:0 12px 60px}
@@ -116,9 +114,10 @@
   .field-row .field{flex:1}
   .field-check{flex-direction:row;align-items:center;gap:6px}
   .field-check label{text-transform:none;font-size:13px;font-weight:400}
-  .slot-row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
-  .slot-row input{flex:1}
-  .slot-rm{border:none;background:none;color:var(--danger);cursor:pointer;font-size:16px;padding:0 4px}
+  .slot-row{border:1px solid var(--line);border-radius:2px;padding:12px 12px 2px;margin-bottom:10px;position:relative}
+  .slot-row .dt-row{display:flex;gap:10px;margin-bottom:10px}
+  .slot-row .dt-row .field{flex:1;min-width:0}
+  .slot-rm{position:absolute;top:6px;right:8px;border:none;background:none;color:var(--danger);cursor:pointer;font-size:16px;padding:0 4px}
   .addslot{font:inherit;font-size:12px;border:1.5px dashed var(--line);background:none;
     color:var(--ink-soft);padding:5px 10px;border-radius:2px;cursor:pointer;margin-bottom:10px}
   .check-group{display:flex;flex-wrap:wrap;gap:8px}
@@ -368,7 +367,8 @@ function card(e){
   const el=document.createElement("details"); el.className="ev";
   const posterSm=e.poster?`<img class="poster-sm" src="${ADMIN_API_BASE}/posters/${esc(e.poster)}" alt="">`
     :`<div class="poster-sm ph">n/d</div>`;
-  const poster=e.poster?`<img class="poster" src="${ADMIN_API_BASE}/posters/${esc(e.poster)}" alt="">`
+  const poster=e.poster?`<a href="${ADMIN_API_BASE}/posters/${esc(e.poster)}" target="_blank" rel="noopener"
+      title="Apri a piena dimensione"><img class="poster" src="${ADMIN_API_BASE}/posters/${esc(e.poster)}" alt=""></a>`
     :`<div class="poster ph">nessuna locandina</div>`;
   const slots=e.slots.map(s=>`<div>${esc(fmtSlot(s))}</div>`).join("");
   const firstSlot=e.slots[0]?fmtSlot(e.slots[0]):"";
@@ -471,9 +471,18 @@ let editingId=null;
 
 function slotRow(start="",end=""){
   const row=document.createElement("div"); row.className="slot-row";
-  row.innerHTML=`<input type="datetime-local" class="slot-start" required value="${start}">
-    <input type="datetime-local" class="slot-end" required value="${end}">
-    <button type="button" class="slot-rm" title="rimuovi">×</button>`;
+  const [sd,st="" ]=start?start.split("T"):[""];
+  const [ed,et="" ]=end?end.split("T"):[""];
+  row.innerHTML=`
+    <button type="button" class="slot-rm" title="rimuovi">×</button>
+    <div class="dt-row">
+      <div class="field"><label>Data inizio</label><input type="date" class="slot-start-date" required value="${sd}"></div>
+      <div class="field"><label>Ora inizio</label><input type="time" class="slot-start-time" required value="${st.slice(0,5)}"></div>
+    </div>
+    <div class="dt-row">
+      <div class="field"><label>Data fine</label><input type="date" class="slot-end-date" required value="${ed}"></div>
+      <div class="field"><label>Ora fine</label><input type="time" class="slot-end-time" required value="${et.slice(0,5)}"></div>
+    </div>`;
   row.querySelector(".slot-rm").addEventListener("click",()=>{
     if(slotsEl.children.length>1) row.remove();
   });
@@ -566,9 +575,11 @@ newform.addEventListener("submit",async e=>{
   e.preventDefault();
   modalErr.classList.remove("show");
   const fd=new FormData(newform);
-  const slots=[...slotsEl.querySelectorAll(".slot-row")].map(r=>({
-    start:r.querySelector(".slot-start").value, end:r.querySelector(".slot-end").value
-  }));
+  const slots=[...slotsEl.querySelectorAll(".slot-row")].map(r=>{
+    const sd=r.querySelector(".slot-start-date").value, st=r.querySelector(".slot-start-time").value;
+    const ed=r.querySelector(".slot-end-date").value, et=r.querySelector(".slot-end-time").value;
+    return { start: sd&&st ? `${sd}T${st}` : "", end: ed&&et ? `${ed}T${et}` : "" };
+  });
   if(slots.some(s=>!s.start||!s.end)){
     modalErr.textContent="Compila tutti gli orari inseriti."; modalErr.classList.add("show"); return;
   }

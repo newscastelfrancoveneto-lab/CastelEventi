@@ -32,9 +32,11 @@
   .field-check label{text-transform:none;font-size:14px;font-weight:400}
   fieldset{border:1px solid var(--line);border-radius:4px;padding:16px;margin:0 0 20px}
   legend{font-family:ui-serif,Georgia,serif;font-size:17px;padding:0 8px}
-  .slot-row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
-  .slot-row input{flex:1}
-  .slot-rm{border:none;background:none;color:var(--danger);cursor:pointer;font-size:18px;padding:0 4px}
+  .slot-row{border:1px solid var(--line);border-radius:3px;padding:12px 14px 4px;margin-bottom:10px;position:relative}
+  .dt-row{display:flex;gap:10px;margin-bottom:10px}
+  .dt-row .field{flex:1;min-width:0}
+  .slot-rm{position:absolute;top:8px;right:10px;border:none;background:none;color:var(--danger);
+    cursor:pointer;font-size:18px;padding:0 4px;line-height:1}
   .addslot{font:inherit;font-size:13px;border:1.5px dashed var(--line);background:none;
     color:var(--ink-soft);padding:6px 12px;border-radius:2px;cursor:pointer;margin-bottom:6px}
   .check-group{display:flex;flex-wrap:wrap;gap:8px}
@@ -67,8 +69,6 @@
   @media(max-width:480px){
     .wrap{padding:0 14px 60px}
     .field-row{flex-direction:column;gap:14px}
-    .slot-row{flex-wrap:wrap}
-    .slot-row input{flex:1 1 100%}
     .contact-row{flex-wrap:wrap}
     .contact-row select{flex:1 1 100%}
     .contact-row input{flex:1 1 100%}
@@ -205,9 +205,16 @@ let TOWN_BBOX=[45.650,11.905,45.690,11.950]; // fallback; sovrascritto da /event
 
 function slotRow(){
   const row=document.createElement("div"); row.className="slot-row";
-  row.innerHTML=`<input type="datetime-local" class="slot-start" required>
-    <input type="datetime-local" class="slot-end" required>
-    <button type="button" class="slot-rm" title="rimuovi">×</button>`;
+  row.innerHTML=`
+    <button type="button" class="slot-rm" title="rimuovi">×</button>
+    <div class="dt-row">
+      <div class="field"><label>Data inizio</label><input type="date" class="slot-start-date" required></div>
+      <div class="field"><label>Ora inizio</label><input type="time" class="slot-start-time" required></div>
+    </div>
+    <div class="dt-row">
+      <div class="field"><label>Data fine</label><input type="date" class="slot-end-date" required></div>
+      <div class="field"><label>Ora fine</label><input type="time" class="slot-end-time" required></div>
+    </div>`;
   row.querySelector(".slot-rm").addEventListener("click",()=>{
     if(slotsEl.children.length>1) row.remove();
   });
@@ -292,9 +299,11 @@ form.addEventListener("submit", async e=>{
   submitBtn.disabled=true; submitBtn.textContent="Invio…";
   errEl.classList.remove("show");
   const fd=new FormData(form);
-  const slots=[...slotsEl.querySelectorAll(".slot-row")].map(r=>({
-    start:r.querySelector(".slot-start").value, end:r.querySelector(".slot-end").value
-  }));
+  const slots=[...slotsEl.querySelectorAll(".slot-row")].map(r=>{
+    const sd=r.querySelector(".slot-start-date").value, st=r.querySelector(".slot-start-time").value;
+    const ed=r.querySelector(".slot-end-date").value, et=r.querySelector(".slot-end-time").value;
+    return { start: sd&&st ? `${sd}T${st}` : "", end: ed&&et ? `${ed}T${et}` : "" };
+  });
   function fail(msg){
     errEl.textContent=msg; errEl.classList.add("show");
     submitBtn.disabled=false; submitBtn.textContent="Invia proposta";
