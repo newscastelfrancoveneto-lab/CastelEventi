@@ -398,7 +398,7 @@
 // finche' non torna su (non e' piu' un semplice "le immagini non caricano").
 // RUNBOOK §5: valorizzare con l'URL Funnel quando noto.
 const PI_BASE = (location.hostname==="localhost"||location.hostname==="127.0.0.1")
-  ? "http://127.0.0.1:8091" : "https://SOSTITUISCI-CON-URL-FUNNEL.ts.net";
+  ? "http://127.0.0.1:8091" : "https://andrea.tail04be23.ts.net:8443";
 const POSTER_BASE = PI_BASE;
 
 // ---- icone SVG (niente emoji: rendering incoerente tra piattaforme) ----
@@ -418,46 +418,10 @@ function icon(name){
 // ---- STEP 1: dati serviti da events.json (qui inline come fallback per l'anteprima) ----
 // In produzione: sostituisci FALLBACK con  await fetch('./events.json').then(r=>r.json())
 // Lo schema qui sotto è quello BLOCCATO. Nota `slots`: un evento multi-giorno = UNA riga.
-const FALLBACK = { events: [
-  {
-    id:"a1", title:"Sagra di San Liberale", category:"sagra",
-    slots:[
-      {start:"2026-07-18T18:30", end:"2026-07-18T23:30"},
-      {start:"2026-07-19T12:00", end:"2026-07-19T15:00"},
-      {start:"2026-07-19T18:30", end:"2026-07-19T23:30"},
-      {start:"2026-07-20T18:30", end:"2026-07-20T23:30"}
-    ],
-    venue_name:"Borgo Treviso", lat:45.6721, lon:11.9298,
-    poster:null, cost:"Ingresso libero", is_free:true,
-    food:"full", food_note:"Grigliata, bigoli, gnocchi",
-    description:"Stand gastronomici, musica dal vivo e pesca di beneficenza.",
-    contact_public:{type:"telefono", value:"+39 340 0000000"}
-  },
-  {
-    id:"a2", title:"Giorgione in Duomo — visita guidata", category:"cultura",
-    slots:[{start:"2026-07-18T17:00", end:"2026-07-18T18:00"}],
-    venue_name:"Duomo di Santa Maria Assunta", lat:45.6719, lon:11.9296,
-    poster:null, cost:"5 €", is_free:false, food:"none",
-    description:"Approfondimento sulla Pala di Castelfranco.",
-    contact_public:{type:"email", value:"info@example.org"}
-  },
-  {
-    id:"a3", title:"Mercato dell'antiquariato", category:"mercato",
-    slots:[{start:"2026-07-19T08:00", end:"2026-07-19T19:00"}],
-    venue_name:"Piazza Giorgione", lat:45.6725, lon:11.9291,
-    poster:null, cost:"Gratis", is_free:true, food:"drinks",
-    description:"Banchi di modernariato, libri e stampe sotto le mura.",
-    contact_public:{type:"social", value:"@proloco.castelfranco"}
-  },
-  {
-    id:"a4", title:"Concerto d'estate — Banda cittadina", category:"concerto",
-    slots:[{start:"2026-07-25T21:00", end:"2026-07-25T22:30"}],
-    venue_name:"Teatro Accademico", lat:45.6716, lon:11.9302,
-    poster:null, cost:"Gratis", is_free:true, food:"none",
-    description:"Programma con musiche da film e classici italiani.",
-    contact_public:{type:"telefono", value:"+39 0423 000000"}
-  }
-]};
+// Nessun dato finto: se il Pi/Funnel non risponde, meglio dirlo chiaramente
+// (vedi RUNBOOK §6.5) che mostrare eventi di esempio spacciati per reali.
+const FALLBACK = { town_bbox:[45.650,11.905,45.690,11.950], events: [] };
+let dataLoadFailed = false;
 
 const CAT_LABEL = {sagra:"Sagra",concerto:"Concerto",cultura:"Cultura",sport:"Sport",mercato:"Mercato",altro:"Altro"};
 const DOW = ["Dom","Lun","Mar","Mer","Gio","Ven","Sab"];
@@ -985,8 +949,14 @@ async function loadWeather(){
 (async()=>{
   try{
     const r=await fetch(PI_BASE+"/events.json",{cache:"no-store"});
-    if(r.ok){ DATA=await r.json(); }
-  }catch(_){/* anteprima: usa FALLBACK */}
+    if(r.ok){ DATA=await r.json(); } else { dataLoadFailed=true; }
+  }catch(_){ dataLoadFailed=true; }
+  if(dataLoadFailed){
+    const bar=document.createElement("div");
+    bar.style.cssText="background:#93341f;color:#fff;text-align:center;padding:8px 14px;font-size:13px";
+    bar.textContent="Dati momentaneamente non disponibili — riprova tra poco.";
+    document.body.prepend(bar);
+  }
   render();
   if(leafletMap) buildMapMarkers();
   focusFromHash();

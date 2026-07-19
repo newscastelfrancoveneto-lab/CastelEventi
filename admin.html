@@ -278,7 +278,7 @@
 // puo' fare nulla — e' per questo che puo' essere pubblica senza rischio.
 // RUNBOOK §5: valorizzare con l'URL tailnet quando noto, es. "https://<macchina>.<tailnet>.ts.net:8090"
 const ADMIN_API_BASE = (location.hostname==="localhost"||location.hostname==="127.0.0.1")
-  ? "http://127.0.0.1:8090" : "https://SOSTITUISCI-CON-URL-TAILNET.ts.net";
+  ? "http://127.0.0.1:8090" : "https://andrea.tail04be23.ts.net:9443";
 const TOKEN_KEY = "ce_admin_token";
 function getToken(){ return sessionStorage.getItem(TOKEN_KEY); }
 function setToken(v){ if(v) sessionStorage.setItem(TOKEN_KEY, v); else sessionStorage.removeItem(TOKEN_KEY); }
