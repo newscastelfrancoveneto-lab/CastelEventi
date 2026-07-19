@@ -168,7 +168,20 @@
     font-family:inherit;
   }
   .search:focus{outline:none;border-color:var(--brick)}
-  .filters{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+  .filters-dropdown{position:relative;margin-top:11px}
+  .filters-toggle{display:inline-flex;align-items:center;gap:6px;list-style:none}
+  .filters-toggle::-webkit-details-marker{display:none}
+  .filters-toggle::marker{content:""}
+  .filters-toggle::after{content:"▾";font-size:10px;color:var(--ink-soft)}
+  .filters-dropdown[open] .filters-toggle{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .filters-dropdown[open] .filters-toggle::after{content:"▴"}
+  .filters-count{background:var(--brick);color:#fff;font-size:11px;font-weight:700;
+    min-width:16px;height:16px;padding:0 4px;border-radius:100px;display:inline-flex;
+    align-items:center;justify-content:center;line-height:1}
+  .filters{display:flex;flex-wrap:wrap;gap:7px;
+    position:absolute;top:calc(100% + 8px);left:0;z-index:20;width:min(440px,90vw);
+    background:#fff;border:1px solid var(--line);border-radius:6px;
+    box-shadow:0 10px 30px rgba(0,0,0,.18);padding:12px}
   .chip{
     border:1.5px solid var(--line);background:#fff;color:var(--ink-soft);
     font:inherit;font-size:13px;padding:6px 12px;border-radius:100px;
@@ -389,19 +402,22 @@
 
   <div class="controls">
     <input class="search" id="q" type="search" placeholder="Cerca un evento, un luogo…" aria-label="Cerca">
-    <div class="filters" id="filters">
-      <button class="chip cat-f" data-cat="sagra" aria-pressed="false">Sagre</button>
-      <button class="chip cat-f" data-cat="concerto" aria-pressed="false">Concerti</button>
-      <button class="chip cat-f" data-cat="cultura" aria-pressed="false">Cultura</button>
-      <button class="chip cat-f" data-cat="sport" aria-pressed="false">Sport</button>
-      <button class="chip cat-f" data-cat="mercato" aria-pressed="false">Mercati</button>
-      <button class="chip free" id="f-free" aria-pressed="false">Gratis</button>
-      <button class="chip food" id="f-food" aria-pressed="false">Con cucina</button>
-      <button class="chip food" id="f-bar" aria-pressed="false">Con bar</button>
-      <button class="chip venue-f" data-vt="indoor" aria-pressed="false">Al chiuso</button>
-      <button class="chip venue-f" data-vt="outdoor" aria-pressed="false">All'aperto</button>
-      <button class="chip venue-f" data-vt="both" aria-pressed="false">Entrambi</button>
-    </div>
+    <details class="filters-dropdown" id="filters-dropdown">
+      <summary class="chip filters-toggle">Filtri<span class="filters-count" id="filters-count" hidden></span></summary>
+      <div class="filters" id="filters">
+        <button class="chip cat-f" data-cat="sagra" aria-pressed="false">Sagre</button>
+        <button class="chip cat-f" data-cat="concerto" aria-pressed="false">Concerti</button>
+        <button class="chip cat-f" data-cat="cultura" aria-pressed="false">Cultura</button>
+        <button class="chip cat-f" data-cat="sport" aria-pressed="false">Sport</button>
+        <button class="chip cat-f" data-cat="mercato" aria-pressed="false">Mercati</button>
+        <button class="chip free" id="f-free" aria-pressed="false">Gratis</button>
+        <button class="chip food" id="f-food" aria-pressed="false">Con cucina</button>
+        <button class="chip food" id="f-bar" aria-pressed="false">Con bar</button>
+        <button class="chip venue-f" data-vt="indoor" aria-pressed="false">Al chiuso</button>
+        <button class="chip venue-f" data-vt="outdoor" aria-pressed="false">All'aperto</button>
+        <button class="chip venue-f" data-vt="both" aria-pressed="false">Entrambi</button>
+      </div>
+    </details>
 
     <div class="controls-divider"></div>
 
@@ -577,7 +593,14 @@ function passesFilter(e){
   return true;
 }
 
+function updateFiltersCount(){
+  const n = state.cats.size + state.venueTypes.size + (state.free?1:0) + (state.food?1:0) + (state.bar?1:0);
+  const el = document.getElementById("filters-count");
+  el.hidden = n===0;
+  el.textContent = n;
+}
 function render(){
+  updateFiltersCount();
   const todayKey = localDateKey(new Date());
   const items = expand(DATA.events).filter(i=>passesFilter(i.ev) && i.key>=todayKey);
   const list=document.getElementById("list");
@@ -797,6 +820,10 @@ document.querySelectorAll(".venue-f").forEach(b=>b.addEventListener("click",()=>
   b.setAttribute("aria-pressed",String(!on)); on?state.venueTypes.delete(vt):state.venueTypes.add(vt);
   render();
 }));
+document.addEventListener("click",e=>{
+  const dd=document.getElementById("filters-dropdown");
+  if(dd.open && !dd.contains(e.target)) dd.open=false;
+});
 
 // ---- mini mappa: un pallino per luogo, verde se oggi c'e' un evento, giallo se prossimamente.
 // legenda cliccabile: filtra quali marker mostrare, di default entrambi (standard = tutto visibile).
