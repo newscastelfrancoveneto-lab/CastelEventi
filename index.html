@@ -229,6 +229,8 @@
   .b.food{color:var(--moat);border-color:var(--moat)}
   .modal-desc{font-size:14px;color:var(--ink-soft);line-height:1.5}
   .modal-contact a{color:var(--brick);text-decoration:none;border-bottom:1px solid var(--line)}
+  .modal-row.modal-contact{display:block}
+  .modal-row.modal-contact>div+div{margin-top:4px}
   .modal-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
   .modal-action{border:1.5px solid var(--line);background:#fff;padding:9px 14px;border-radius:2px;
     font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;color:var(--ink);
@@ -569,7 +571,7 @@ function openModal(e){
   const freeBadge = e.is_free ? '<span class="b free">Gratis</span>' : '';
   const DISC_LABEL=d=>d.type==="studenti"?"Studenti":d.type==="over"?`Over ${d.age}`:`Under ${d.age}`;
   const discountsTxt=(e.discounts||[]).map(DISC_LABEL).join(", ");
-  const contacts=(e.contacts||[]).map(renderContact).join("<br>");
+  const contacts=(e.contacts||[]).map(c=>`<div>${renderContact(c)}</div>`).join("");
   const catsTxt=(e.categories||[]).map(c=>CAT_LABEL[c]||c).join(", ");
   const datesHtml = e.slots.map(s=>
     `<div class="modal-date-row">${fmtDateLong(s.start)}<span class="arrow">→</span>${fmtDateLong(s.end)}</div>`
