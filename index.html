@@ -923,7 +923,12 @@ function weatherIconSvg(category, isNight){
     `<circle class="w-snow-flake" style="animation-delay:${(i*0.35).toFixed(2)}s" cx="${x.toFixed(1)}" cy="${37+(i%2?2:-2)}" r="2.3" fill="#bfdbfe"/>`).join("");
   const sunRays=(cx,cy,len,count,stroke)=>{ let out=""; for(let i=0;i<count;i++){ const a=(Math.PI*2*i)/count, r1=len, r2=len+6;
     out+=`<line x1="${(cx+Math.cos(a)*r1).toFixed(1)}" y1="${(cy+Math.sin(a)*r1).toFixed(1)}" x2="${(cx+Math.cos(a)*r2).toFixed(1)}" y2="${(cy+Math.sin(a)*r2).toFixed(1)}" stroke="${stroke}" stroke-width="2.4" stroke-linecap="round"/>`; } return out; };
-  const moonAndStars=(cx,cy,r,stars)=>`<g class="w-moon-core"><path d="M${cx-r*0.35} ${cy-r} a${r} ${r} 0 1 0 0 ${r*2} a${r*0.78} ${r*0.78} 0 0 1 0 -${r*2}z" fill="url(#${uid}-moon)" stroke="#54637a" stroke-width="0.6" filter="url(#${uid}-glow)"/></g>
+  const moonAndStars=(cx,cy,r,stars)=>`<g class="w-moon-core">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#${uid}-moon)" stroke="#54637a" stroke-width="0.6" filter="url(#${uid}-glow)"/>
+    <circle cx="${(cx-r*0.32).toFixed(1)}" cy="${(cy-r*0.28).toFixed(1)}" r="${(r*0.22).toFixed(1)}" fill="#54637a" opacity=".28"/>
+    <circle cx="${(cx+r*0.28).toFixed(1)}" cy="${(cy+r*0.12).toFixed(1)}" r="${(r*0.15).toFixed(1)}" fill="#54637a" opacity=".22"/>
+    <circle cx="${(cx-r*0.05).toFixed(1)}" cy="${(cy+r*0.38).toFixed(1)}" r="${(r*0.12).toFixed(1)}" fill="#54637a" opacity=".2"/>
+  </g>
     <g fill="#f8fafc">${stars.map((s,i)=>`<circle class="w-star" style="animation-delay:${(i*0.6).toFixed(2)}s" cx="${s[0]}" cy="${s[1]}" r="${s[2]}"/>`).join("")}</g>`;
 
   const svgs={
