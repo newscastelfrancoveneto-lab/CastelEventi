@@ -631,10 +631,21 @@ function focusFromHash(){
   if(found) openModal(found.ev);
 }
 
+function contactUrl(type,value){
+  if(/^https?:\/\//i.test(value)) return value;
+  const handle=value.replace(/^@/,"").trim();
+  if(type==="instagram") return `https://instagram.com/${handle}`;
+  if(type==="facebook") return `https://facebook.com/${handle}`;
+  if(type==="tiktok") return `https://tiktok.com/@${handle}`;
+  if(type==="sito") return `https://${value.replace(/^\/+/,"")}`;
+  return null;   // "social"/altro non riconosciuto: nessun link costruibile, solo testo
+}
 function renderContact(c){
   if(!c) return "";
   if(c.type==="email") return `${icon("mail")} <a href="mailto:${c.value}">${esc(c.value)}</a>`;
   if(c.type==="telefono") return `${icon("phone")} <a href="tel:${c.value.replace(/\s/g,'')}">${esc(c.value)}</a>`;
+  const url=contactUrl(c.type, c.value);
+  if(url) return `${icon("share")} <a href="${esc(url)}" target="_blank" rel="noopener">${esc(c.value)}</a>`;
   return `${icon("share")} ${esc(c.value)}`;
 }
 function esc(s){return String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
