@@ -520,7 +520,6 @@ function shortAddress(r){
   const name=r.display_name.split(",")[0].trim();
   const parts=[];
   if(a.road && a.road.trim()!==name) parts.push(a.road);
-  if(a.suburb) parts.push(a.suburb);
   const city=a.town||a.city||a.village||a.municipality;
   if(city) parts.push(city);
   return [...new Set(parts)].join(", ") || r.display_name;
