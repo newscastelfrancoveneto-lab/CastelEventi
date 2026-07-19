@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · News Castelfranco</title>
+<style>
+  :root{
+    --ink:#16130f; --ink-soft:#5f574c; --paper:#f4efe6; --panel:#fffdf8;
+    --line:#d8cfbd; --brick:#8d021f; --moat:#3f5a4c; --free:#2f6b4f;
+    --amber:#9a6b12; --danger:#93341f;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    line-height:1.45;font-size:15px}
+  .wrap{max-width:900px;margin:0 auto;padding:0 18px 80px}
+  header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+    flex-wrap:wrap;border-bottom:2px solid var(--ink);padding:22px 0 14px}
+  h1{font-family:ui-serif,Georgia,serif;font-size:26px;margin:0;letter-spacing:-.02em}
+  h1 small{font-family:ui-sans-serif,system-ui,sans-serif;font-size:12px;font-weight:600;
+    color:#fff;background:var(--brick);padding:2px 8px;border-radius:2px;vertical-align:middle;
+    margin-left:8px;letter-spacing:.05em}
+  .pubbtn{border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);
+    font:inherit;font-size:13px;font-weight:600;padding:8px 14px;border-radius:2px;cursor:pointer}
+  .pubbtn:hover{background:var(--brick);border-color:var(--brick)}
+
+  .tabs{display:flex;gap:6px;margin:16px 0 4px;flex-wrap:wrap;position:sticky;top:0;
+    background:var(--paper);padding:10px 0;z-index:5;border-bottom:1px solid var(--line)}
+  .tab{border:1.5px solid var(--line);background:var(--panel);color:var(--ink-soft);
+    font:inherit;font-size:13px;padding:6px 12px;border-radius:100px;cursor:pointer}
+  .tab[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .tab .n{display:inline-block;min-width:18px;text-align:center;margin-left:6px;
+    background:rgba(0,0,0,.12);border-radius:100px;padding:0 6px;font-size:11px}
+  .tab[aria-selected="true"] .n{background:rgba(255,255,255,.2)}
+  .tab.pending .n{background:var(--amber);color:#fff}
+
+  .ev{background:var(--panel);border:1px solid var(--line);border-radius:4px;margin-top:14px}
+  .ev summary{display:grid;grid-template-columns:52px 1fr auto;gap:12px;align-items:center;
+    padding:10px 12px;cursor:pointer;list-style:none}
+  .ev summary::-webkit-details-marker{display:none}
+  .ev summary::marker{content:""}
+  .ev summary .chev{color:var(--ink-soft);font-size:13px;transition:.15s;justify-self:end}
+  .ev[open] summary .chev{transform:rotate(90deg)}
+  .ev-body{padding:0 14px 14px;border-top:1px solid var(--line);
+    display:grid;grid-template-columns:96px 1fr;gap:14px;padding-top:12px}
+  .poster-sm{width:52px;height:52px;object-fit:cover;border-radius:3px;background:#e7e0d0}
+  .poster-sm.ph{display:flex;align-items:center;justify-content:center;color:var(--ink-soft);
+    font-size:8px;text-align:center}
+  .poster{width:96px;height:128px;object-fit:cover;border-radius:3px;background:#e7e0d0}
+  .poster.ph{display:flex;align-items:center;justify-content:center;color:var(--ink-soft);
+    font-size:11px;text-align:center;padding:6px}
+  .ev h3{font-family:ui-serif,Georgia,serif;font-size:19px;margin:0 0 3px;letter-spacing:-.01em}
+  .s-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+  .s-title{font-family:ui-serif,Georgia,serif;font-size:16px;font-weight:600;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:3px}
+  .cat{font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;
+    background:#efe8d8;color:var(--brick);padding:2px 7px;border-radius:2px}
+  .st{font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;
+    padding:2px 7px;border-radius:2px;border:1px solid var(--line)}
+  .st.pending{color:var(--amber);border-color:var(--amber)}
+  .st.published{color:var(--free);border-color:var(--free)}
+  .st.rejected,.st.cancelled{color:var(--danger);border-color:var(--danger)}
+  .st.pending_verification{color:var(--ink-soft)}
+  .slots{font-size:13px;margin:6px 0}
+  .slots b{font-weight:600}
+  .meta{font-size:13px;color:var(--ink-soft);display:flex;flex-wrap:wrap;gap:2px 14px}
+  .priv{margin-top:10px;background:#f7f2e8;border:1px dashed var(--line);border-radius:3px;
+    padding:8px 10px;font-size:12px;color:var(--ink-soft)}
+  .priv b{color:var(--ink)}
+  .priv .warn{color:var(--danger);font-weight:600}
+  .priv .ok{color:var(--free);font-weight:600}
+  .icon{width:1em;height:1em;vertical-align:-0.15em;display:inline-block}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+  .btn{font:inherit;font-size:13px;font-weight:600;padding:7px 13px;border-radius:2px;
+    cursor:pointer;border:1.5px solid}
+  .approve{background:var(--free);border-color:var(--free);color:#fff}
+  .reject{background:var(--panel);border-color:var(--danger);color:var(--danger)}
+  .cancel{background:var(--panel);border-color:var(--amber);color:var(--amber)}
+  .edit{background:var(--panel);border-color:var(--line);color:var(--ink)}
+  .btn:hover{filter:brightness(.94)}
+  .reason{font:inherit;font-size:13px;padding:6px 8px;border:1.5px solid var(--line);
+    border-radius:2px;flex:1;min-width:120px}
+  .empty{text-align:center;color:var(--ink-soft);font-family:ui-serif,Georgia,serif;
+    font-style:italic;padding:50px;font-size:17px}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:3px;
+    font-size:13px;opacity:0;transition:.2s;pointer-events:none}
+  .toast.show{opacity:1}
+  @media(max-width:520px){
+    .ev{grid-template-columns:1fr}.poster{width:100%;height:160px}
+    .field-row{flex-direction:column;gap:14px}
+    .contact-row{flex-wrap:wrap}
+    .contact-row select,.contact-row input{flex:1 1 100%}
+    .wrap{padding:0 12px 60px}
+  }
+
+  .newbtn{border:1.5px solid var(--brick);background:var(--panel);color:var(--brick);
+    font:inherit;font-size:13px;font-weight:600;padding:8px 14px;border-radius:2px;cursor:pointer}
+  .newbtn:hover{background:var(--brick);color:#fff}
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(22,19,15,.55);z-index:20;
+    align-items:flex-start;justify-content:center;overflow:auto;padding:40px 14px}
+  .modal-bg.show{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:4px;
+    max-width:560px;width:100%;padding:20px 22px 22px}
+  .modal h2{font-family:ui-serif,Georgia,serif;font-size:21px;margin:0 0 14px}
+  .field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+  .field label{font-size:12px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em}
+  .field input,.field select,.field textarea{font:inherit;font-size:14px;padding:7px 9px;
+    border:1.5px solid var(--line);border-radius:2px;background:#fff;color:var(--ink)}
+  .field textarea{resize:vertical;min-height:60px}
+  .field-row{display:flex;gap:10px}
+  .field-row .field{flex:1}
+  .field-check{flex-direction:row;align-items:center;gap:6px}
+  .field-check label{text-transform:none;font-size:13px;font-weight:400}
+  .slot-row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+  .slot-row input{flex:1}
+  .slot-rm{border:none;background:none;color:var(--danger);cursor:pointer;font-size:16px;padding:0 4px}
+  .addslot{font:inherit;font-size:12px;border:1.5px dashed var(--line);background:none;
+    color:var(--ink-soft);padding:5px 10px;border-radius:2px;cursor:pointer;margin-bottom:10px}
+  .check-group{display:flex;flex-wrap:wrap;gap:8px}
+  .check-group label{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;
+    border:1.5px solid var(--line);padding:5px 10px;border-radius:100px;cursor:pointer}
+  .check-group label:has(input:checked){border-color:var(--brick);background:#fdf3f0}
+  .check-group input[type="number"]{width:60px;padding:3px 6px;font-size:12px;
+    border:1px solid var(--line);border-radius:2px;margin-left:2px}
+  .contact-row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+  .contact-row select{flex:0 0 110px}
+  .contact-row input{flex:1;font:inherit;font-size:13px;padding:6px 8px;
+    border:1.5px solid var(--line);border-radius:2px}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
+  .modal-cancel{font:inherit;font-size:13px;background:none;border:none;color:var(--ink-soft);cursor:pointer}
+  .modal-err{color:var(--danger);font-size:13px;margin-bottom:10px;display:none}
+  .modal-err.show{display:block}
+
+  /* ---------- login ---------- */
+  #login{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+  .login-box{background:var(--panel);border:1px solid var(--line);border-radius:4px;
+    padding:28px 26px;width:100%;max-width:320px}
+  .login-box h1{font-family:ui-serif,Georgia,serif;font-size:22px;margin:0 0 18px}
+  .login-box .field{margin-bottom:14px}
+  .login-box .field input{width:100%;font:inherit;font-size:15px;padding:9px 10px;
+    border:1.5px solid var(--line);border-radius:2px;background:#fff}
+  .login-box button{width:100%;font:inherit;font-size:14px;font-weight:600;padding:10px;
+    border-radius:2px;border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);
+    cursor:pointer;margin-top:4px}
+  .login-box button:hover{background:var(--brick);border-color:var(--brick)}
+  .login-err{color:var(--danger);font-size:13px;margin-bottom:14px;display:none}
+  .login-back{display:block;text-align:center;margin-top:14px;font-size:13px;
+    color:var(--ink-soft);text-decoration:none}
+  .login-back:hover{color:var(--brick)}
+</style>
+</head>
+<body>
+<div id="login">
+  <div class="login-box">
+    <h1>Accesso admin</h1>
+    <div class="login-err" id="login-err">Credenziali non valide.</div>
+    <form id="loginform">
+      <div class="field"><label>Utente</label><input name="username" autofocus required autocomplete="username"></div>
+      <div class="field"><label>Password</label><input name="password" type="password" required autocomplete="current-password"></div>
+      <button type="submit">Entra</button>
+    </form>
+    <a class="login-back" href="./index.html">← Torna alla pagina principale</a>
+  </div>
+</div>
+
+<div class="wrap" id="admin-shell" style="display:none">
+  <header>
+    <h1>Eventi <small>ADMIN</small></h1>
+    <div class="row" style="gap:8px">
+      <a class="newbtn" href="./index.html" style="text-decoration:none;display:inline-block">Torna al sito</a>
+      <button class="newbtn" id="newbtn">+ Nuovo evento</button>
+      <button class="pubbtn" id="pub">Rigenera events.json</button>
+      <button class="newbtn" id="logoutbtn" style="border-color:var(--danger);color:var(--danger)">Esci</button>
+    </div>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <button class="tab pending" data-status="pending" aria-selected="true">Da moderare <span class="n" id="n-pending">0</span></button>
+    <button class="tab" data-status="pending_verification" aria-selected="false">Non verificati <span class="n" id="n-pending_verification">0</span></button>
+    <button class="tab" data-status="published" aria-selected="false">Pubblicati <span class="n" id="n-published">0</span></button>
+    <button class="tab" data-status="all" aria-selected="false">Tutti</button>
+  </div>
+
+  <div id="list" aria-live="polite"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <h2 id="modal-title">Nuovo evento</h2>
+    <div class="modal-err" id="modal-err"></div>
+    <form id="newform">
+      <div class="field"><label>Titolo</label><input name="title" required></div>
+
+      <div class="field"><label>Categorie (una o più)</label>
+        <div class="check-group">
+          <label><input type="checkbox" name="categories" value="sagra">sagra</label>
+          <label><input type="checkbox" name="categories" value="concerto">concerto</label>
+          <label><input type="checkbox" name="categories" value="cultura">cultura</label>
+          <label><input type="checkbox" name="categories" value="sport">sport</label>
+          <label><input type="checkbox" name="categories" value="mercato">mercato</label>
+          <label><input type="checkbox" name="categories" value="altro">altro</label>
+        </div>
+      </div>
+
+      <div class="field"><label>Date e orari</label><div id="slots"></div>
+        <button type="button" class="addslot" id="addslot">+ aggiungi giorno/orario</button>
+      </div>
+
+      <div class="field"><label>Luogo</label><input name="venue_name" required></div>
+      <div class="field"><label>Ambiente</label>
+        <select name="venue_type" required>
+          <option value="">-- seleziona --</option>
+          <option value="indoor">Al chiuso</option>
+          <option value="outdoor">All'aperto</option>
+          <option value="both">Al chiuso e all'aperto</option>
+        </select>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Latitudine</label><input name="lat" type="number" step="0.000001" required></div>
+        <div class="field"><label>Longitudine</label><input name="lon" type="number" step="0.000001" required></div>
+      </div>
+      <div class="field"><label>Indirizzo (opzionale)</label><input name="address"></div>
+
+      <div class="field-row">
+        <div class="field field-check"><input type="checkbox" name="is_free" id="is_free"><label for="is_free">Ingresso gratuito</label></div>
+        <div class="field"><label>Costo (se non gratis)</label><input name="cost" id="cost" placeholder="es. 5€"></div>
+      </div>
+
+      <div class="field"><label>Riduzioni</label>
+        <div class="check-group">
+          <label><input type="checkbox" name="disc_studenti">Studenti</label>
+          <label><input type="checkbox" id="disc_over_chk">Over <input type="number" id="disc_over_age" min="0" max="120" disabled placeholder="età"></label>
+          <label><input type="checkbox" id="disc_under_chk">Under <input type="number" id="disc_under_age" min="0" max="120" disabled placeholder="età"></label>
+        </div>
+      </div>
+
+      <div class="field"><label>Food and beverage</label>
+        <div class="check-group">
+          <label><input type="checkbox" name="food" value="rinfresco">Rinfresco</label>
+          <label><input type="checkbox" name="food" value="bar">Bar</label>
+          <label><input type="checkbox" name="food" value="cucina">Cucina</label>
+        </div>
+      </div>
+      <div class="field"><label>Note food and beverage (opzionale)</label><input name="food_note"></div>
+      <div class="field"><label>Descrizione</label><textarea name="description"></textarea></div>
+
+      <div class="field"><label>Contatti pubblici</label>
+        <div id="contacts"></div>
+        <button type="button" class="addslot" id="addcontact">+ aggiungi un contatto</button>
+      </div>
+
+      <div class="field"><label>Email referente (privata, non pubblicata)</label>
+        <input name="contact_email" type="email" required></div>
+
+      <div class="field"><label>Locandina — percorso file locale (opzionale)</label>
+        <input name="poster_path" placeholder="es. C:\percorso\locandina.jpg"></div>
+
+      <div class="field field-check">
+        <input type="checkbox" name="copyright_declared" id="copyright_declared">
+        <label for="copyright_declared">Dichiaro di avere i diritti sulla locandina caricata</label>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="modal-cancel" id="modal-cancel">Annulla</button>
+        <button type="submit" class="btn approve">Crea evento</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// Pagina statica (puo' stare su Pages): l'API resta sul Pi, raggiungibile solo in
+// tailnet. Senza un token valido (rilasciato da /api/admin/login) questa pagina non
+// puo' fare nulla — e' per questo che puo' essere pubblica senza rischio.
+// RUNBOOK §5: valorizzare con l'URL tailnet quando noto, es. "https://<macchina>.<tailnet>.ts.net:8090"
+const ADMIN_API_BASE = (location.hostname==="localhost"||location.hostname==="127.0.0.1")
+  ? "http://127.0.0.1:8090" : "https://SOSTITUISCI-CON-URL-TAILNET.ts.net";
+const TOKEN_KEY = "ce_admin_token";
+function getToken(){ return sessionStorage.getItem(TOKEN_KEY); }
+function setToken(v){ if(v) sessionStorage.setItem(TOKEN_KEY, v); else sessionStorage.removeItem(TOKEN_KEY); }
+function authHeaders(extra={}){ const t=getToken(); return t?{...extra, Authorization:`Bearer ${t}`}:extra; }
+
+const loginEl=document.getElementById("login");
+const shellEl=document.getElementById("admin-shell");
+const loginErr=document.getElementById("login-err");
+function setLogged(v){
+  loginEl.style.display=v?"none":"flex";
+  shellEl.style.display=v?"block":"none";
+  if(v) load();
+}
+async function checkSession(){
+  const t=getToken();
+  if(!t) return setLogged(false);
+  try{
+    const r=await fetch(ADMIN_API_BASE+"/api/admin/check",{headers:authHeaders()});
+    if(!r.ok) throw new Error("unauthorized");
+    setLogged(true);
+  }catch(_){ setToken(null); setLogged(false); }
+}
+document.getElementById("loginform").addEventListener("submit",async e=>{
+  e.preventDefault();
+  loginErr.style.display="none";
+  const fd=new FormData(e.target);
+  try{
+    const r=await fetch(ADMIN_API_BASE+"/api/admin/login",{method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({username:fd.get("username"),password:fd.get("password")})});
+    if(!r.ok){
+      const d=await r.json().catch(()=>({}));
+      loginErr.textContent = r.status===429 ? (d.error||"Troppi tentativi, riprova tra qualche minuto.")
+        : (d.error||"Credenziali non valide.");
+      loginErr.style.display="block";
+      return;
+    }
+    const d=await r.json();
+    setToken(d.token);
+    setLogged(true);
+  }catch(_){
+    loginErr.textContent="Server non raggiungibile (sei nella tailnet?).";
+    loginErr.style.display="block";
+  }
+});
+document.getElementById("logoutbtn").addEventListener("click",async()=>{
+  try{ await fetch(ADMIN_API_BASE+"/api/admin/logout",{method:"POST",headers:authHeaders()}); }catch(_){}
+  setToken(null); setLogged(false);
+});
+
+const DOW=["Dom","Lun","Mar","Mer","Gio","Ven","Sab"];
+const MON=["gen","feb","mar","apr","mag","giu","lug","ago","set","ott","nov","dic"];
+let current="pending";
+
+const ICON_PATHS={
+  check:'<polyline points="20 6 9 17 4 12"/>',
+  x:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+};
+function icon(name){
+  return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON_PATHS[name]}</svg>`;
+}
+
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+function fmtSlot(s){
+  const a=new Date(s.start),b=new Date(s.end);
+  const p=n=>String(n).padStart(2,"0");
+  return `${DOW[a.getDay()]} ${a.getDate()} ${MON[a.getMonth()]} · ${p(a.getHours())}:${p(a.getMinutes())}–${p(b.getHours())}:${p(b.getMinutes())}`;
+}
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),1800)}
+
+async function load(){
+  const r=await fetch(ADMIN_API_BASE+"/api/list?status="+encodeURIComponent(current),{headers:authHeaders()});
+  if(r.status===401){ setToken(null); setLogged(false); return; }
+  const {events,counts}=await r.json();
+  for(const k of ["pending","pending_verification","published"])
+    document.getElementById("n-"+k).textContent=counts[k]||0;
+  const list=document.getElementById("list"); list.innerHTML="";
+  if(!events.length){list.innerHTML='<div class="empty">Niente qui.</div>';return}
+  for(const e of events) list.appendChild(card(e));
+}
+
+function card(e){
+  const el=document.createElement("details"); el.className="ev";
+  const posterSm=e.poster?`<img class="poster-sm" src="${ADMIN_API_BASE}/posters/${esc(e.poster)}" alt="">`
+    :`<div class="poster-sm ph">n/d</div>`;
+  const poster=e.poster?`<img class="poster" src="${ADMIN_API_BASE}/posters/${esc(e.poster)}" alt="">`
+    :`<div class="poster ph">nessuna locandina</div>`;
+  const slots=e.slots.map(s=>`<div>${esc(fmtSlot(s))}</div>`).join("");
+  const firstSlot=e.slots[0]?fmtSlot(e.slots[0]):"";
+  const cp=e.contacts&&e.contacts.length
+    ? e.contacts.map(c=>`${esc(c.type)}: ${esc(c.value)}`).join(" · ") : "—";
+  const FOOD_LABEL={rinfresco:"rinfresco",bar:"bar",cucina:"cucina"};
+  const foodTxt=(e.food&&e.food.length) ? e.food.map(f=>FOOD_LABEL[f]||f).join(", ") : "nessuno";
+  const DISC_LABEL=d=>d.type==="studenti"?"studenti":d.type==="over"?`over ${d.age}`:`under ${d.age}`;
+  const discTxt=(e.discounts&&e.discounts.length) ? e.discounts.map(DISC_LABEL).join(", ") : null;
+  const venueTxt={indoor:"al chiuso",outdoor:"all'aperto",both:"al chiuso e all'aperto"}[e.venue_type]||"non specificato";
+  const catsTxt=(e.categories||[]).join(", ");
+  const cprt=e.copyright_declared?`<span class="ok">dichiarato ${icon("check")}</span>`:`<span class="warn">NON dichiarato ${icon("x")}</span>`;
+  const ver=e.verified_at?`<span class="ok">verificata ${icon("check")}</span>`:'<span class="warn">non verificata</span>';
+  const canModerate=e.status==="pending"||e.status==="pending_verification";
+  const canCancel=e.status==="published";
+  el.innerHTML=`
+    <summary>
+      ${posterSm}
+      <div class="s-top">
+        <span class="cat">${esc(catsTxt)}</span>
+        <span class="st ${esc(e.status)}">${esc(e.status)}</span>
+        <span class="s-title">${esc(e.title)}</span>
+        <span class="meta">${esc(firstSlot)}${e.slots.length>1?` (+${e.slots.length-1})`:""} · ${esc(e.venue_name)}</span>
+      </div>
+      <span class="chev">▸</span>
+    </summary>
+    <div class="ev-body">
+      ${poster}
+      <div>
+        <div class="slots">${slots}</div>
+        <div class="meta">
+          <span>${esc(e.venue_name)}</span>
+          <span>${e.is_free?"gratis":esc(e.cost||"—")}</span>
+          <span>${esc(venueTxt)}</span>
+          <span>food and beverage: ${esc(foodTxt)}${e.food_note?" · "+esc(e.food_note):""}</span>
+          ${discTxt?`<span>riduzioni: ${esc(discTxt)}</span>`:""}
+          <span>contatti pubblici: ${cp}</span>
+        </div>
+        ${e.description?`<div class="meta" style="margin-top:4px">${esc(e.description)}</div>`:""}
+        <div class="priv">
+          <b>Solo admin</b> — email: <b>${esc(e.contact_email||"(cancellata)")}</b> · ${ver}
+          · copyright: ${cprt} · IP: ${esc(e.submit_ip||"—")}
+          ${e.reject_reason?` · rifiutato: ${esc(e.reject_reason)}`:""}
+        </div>
+        <div class="actions" data-id="${esc(e.id)}">
+          <button class="btn edit" data-a="edit">Modifica</button>
+          ${canModerate?`<button class="btn approve" data-a="approve">Approva e pubblica</button>`:""}
+          ${canModerate?`<input class="reason" placeholder="motivo del rifiuto"><button class="btn reject" data-a="reject">Rifiuta</button>`:""}
+          ${canCancel?`<button class="btn cancel" data-a="cancel">Annulla evento</button>`:""}
+        </div>
+      </div>
+    </div>`;
+  el.querySelector('[data-a="edit"]').addEventListener("click",()=>openEditModal(e));
+  el.querySelectorAll(".btn:not([data-a=\"edit\"])").forEach(b=>b.addEventListener("click",()=>act(el,e.id,b.dataset.a)));
+  return el;
+}
+
+async function act(el,id,action){
+  const btns=el.querySelectorAll(".actions .btn");
+  if([...btns].some(b=>b.disabled)) return;   // gia' in corso: niente doppio invio (doppia email)
+  let reason=null;
+  if(action==="reject"){
+    reason=el.querySelector(".reason").value.trim();
+    if(!reason){toast("Serve un motivo per rifiutare");return}
+  }
+  btns.forEach(b=>b.disabled=true);
+  try{
+    const r=await fetch(ADMIN_API_BASE+"/api/action",{method:"POST",
+      headers:authHeaders({"Content-Type":"application/json"}),
+      body:JSON.stringify({id,action,reason})});
+    if(r.status===401){ setToken(null); setLogged(false); return; }
+    const d=await r.json();
+    if(!r.ok){toast("Errore: "+(d.error||r.status));return}
+    toast(`Fatto · ${d.published} eventi pubblici`);
+    load();
+  } finally {
+    btns.forEach(b=>b.disabled=false);
+  }
+}
+
+document.getElementById("tabs").addEventListener("click",e=>{
+  const t=e.target.closest(".tab"); if(!t)return;
+  document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected","false"));
+  t.setAttribute("aria-selected","true"); current=t.dataset.status; load();
+});
+document.getElementById("pub").addEventListener("click",async()=>{
+  const r=await fetch(ADMIN_API_BASE+"/api/publish",{method:"POST",headers:authHeaders()});
+  if(r.status===401){ setToken(null); setLogged(false); return; }
+  const d=await r.json();
+  toast(`Rigenerato · ${d.published} eventi`);
+});
+
+// ---- nuovo evento ----
+const modalBg=document.getElementById("modal-bg");
+const newform=document.getElementById("newform");
+const modalErr=document.getElementById("modal-err");
+const slotsEl=document.getElementById("slots");
+
+let editingId=null;
+
+function slotRow(start="",end=""){
+  const row=document.createElement("div"); row.className="slot-row";
+  row.innerHTML=`<input type="datetime-local" class="slot-start" required value="${start}">
+    <input type="datetime-local" class="slot-end" required value="${end}">
+    <button type="button" class="slot-rm" title="rimuovi">×</button>`;
+  row.querySelector(".slot-rm").addEventListener("click",()=>{
+    if(slotsEl.children.length>1) row.remove();
+  });
+  return row;
+}
+const contactsEl=document.getElementById("contacts");
+function contactRow(type="telefono",value=""){
+  const row=document.createElement("div"); row.className="contact-row";
+  row.innerHTML=`<select class="contact-type">
+      <option value="telefono">telefono</option>
+      <option value="email">email</option>
+      <option value="social">social</option>
+    </select>
+    <input class="contact-value" placeholder="valore" value="${esc(value)}">
+    <button type="button" class="slot-rm" title="rimuovi">×</button>`;
+  row.querySelector(".contact-type").value=type;
+  row.querySelector(".slot-rm").addEventListener("click",()=>row.remove());
+  return row;
+}
+document.getElementById("addcontact").addEventListener("click",()=>contactsEl.appendChild(contactRow()));
+
+const costInput=document.getElementById("cost");
+newform.elements.is_free.addEventListener("change",()=>{
+  costInput.disabled=newform.elements.is_free.checked;
+  if(newform.elements.is_free.checked) costInput.value="";
+});
+["over","under"].forEach(k=>{
+  const chk=document.getElementById(`disc_${k}_chk`), age=document.getElementById(`disc_${k}_age`);
+  chk.addEventListener("change",()=>{ age.disabled=!chk.checked; if(!chk.checked) age.value=""; });
+});
+
+function resetForm(){
+  newform.reset(); modalErr.classList.remove("show"); modalErr.textContent="";
+  slotsEl.innerHTML=""; slotsEl.appendChild(slotRow());
+  contactsEl.innerHTML=""; contactsEl.appendChild(contactRow());
+  costInput.disabled=false;
+  ["over","under"].forEach(k=>document.getElementById(`disc_${k}_age`).disabled=true);
+}
+function openModal(){
+  editingId=null; resetForm();
+  document.getElementById("modal-title").textContent="Nuovo evento";
+  newform.querySelector('button[type="submit"]').textContent="Crea evento";
+  modalBg.classList.add("show");
+}
+function openEditModal(e){
+  editingId=e.id; resetForm();
+  document.getElementById("modal-title").textContent="Modifica evento";
+  newform.querySelector('button[type="submit"]').textContent="Salva modifiche";
+  const el=newform.elements;
+  el.title.value=e.title;
+  newform.querySelectorAll('input[name="categories"]').forEach(i=>i.checked=(e.categories||[]).includes(i.value));
+  el.venue_name.value=e.venue_name;
+  el.venue_type.value=e.venue_type||"";
+  el.lat.value=e.lat; el.lon.value=e.lon; el.address.value=e.address||"";
+  el.is_free.checked=!!e.is_free; el.cost.value=e.cost||""; costInput.disabled=!!e.is_free;
+  newform.querySelectorAll('input[name="food"]').forEach(i=>i.checked=(e.food||[]).includes(i.value));
+  el.food_note.value=e.food_note||"";
+  el.description.value=e.description||"";
+  el.contact_email.value=e.contact_email||"";
+  el.copyright_declared.checked=!!e.copyright_declared;
+  el.poster_path.value="";   // percorso locale sconosciuto: vuoto = mantieni la locandina attuale
+
+  const discounts=e.discounts||[];
+  const stud=discounts.find(d=>d.type==="studenti");
+  document.querySelector('input[name="disc_studenti"]').checked=!!stud;
+  const over=discounts.find(d=>d.type==="over");
+  document.getElementById("disc_over_chk").checked=!!over;
+  document.getElementById("disc_over_age").disabled=!over;
+  document.getElementById("disc_over_age").value=over?over.age:"";
+  const under=discounts.find(d=>d.type==="under");
+  document.getElementById("disc_under_chk").checked=!!under;
+  document.getElementById("disc_under_age").disabled=!under;
+  document.getElementById("disc_under_age").value=under?under.age:"";
+
+  slotsEl.innerHTML="";
+  e.slots.forEach(s=>slotsEl.appendChild(slotRow(s.start,s.end)));
+  contactsEl.innerHTML="";
+  (e.contacts&&e.contacts.length?e.contacts:[{type:"telefono",value:""}])
+    .forEach(c=>contactsEl.appendChild(contactRow(c.type,c.value)));
+  modalBg.classList.add("show");
+}
+function closeModal(){ modalBg.classList.remove("show"); }
+
+document.getElementById("newbtn").addEventListener("click",openModal);
+document.getElementById("modal-cancel").addEventListener("click",closeModal);
+modalBg.addEventListener("click",e=>{ if(e.target===modalBg) closeModal(); });
+document.getElementById("addslot").addEventListener("click",()=>slotsEl.appendChild(slotRow()));
+
+newform.addEventListener("submit",async e=>{
+  e.preventDefault();
+  modalErr.classList.remove("show");
+  const fd=new FormData(newform);
+  const slots=[...slotsEl.querySelectorAll(".slot-row")].map(r=>({
+    start:r.querySelector(".slot-start").value, end:r.querySelector(".slot-end").value
+  }));
+  if(slots.some(s=>!s.start||!s.end)){
+    modalErr.textContent="Compila tutti gli orari inseriti."; modalErr.classList.add("show"); return;
+  }
+  const categories=[...newform.querySelectorAll('input[name="categories"]:checked')].map(i=>i.value);
+  if(!categories.length){
+    modalErr.textContent="Seleziona almeno una categoria."; modalErr.classList.add("show"); return;
+  }
+  const discounts=[];
+  if(document.querySelector('input[name="disc_studenti"]').checked) discounts.push({type:"studenti"});
+  if(document.getElementById("disc_over_chk").checked) discounts.push({type:"over", age:document.getElementById("disc_over_age").value});
+  if(document.getElementById("disc_under_chk").checked) discounts.push({type:"under", age:document.getElementById("disc_under_age").value});
+  const contacts=[...contactsEl.querySelectorAll(".contact-row")].map(r=>({
+    type:r.querySelector(".contact-type").value, value:r.querySelector(".contact-value").value
+  })).filter(c=>c.value.trim());
+  const payload={
+    title:fd.get("title"), categories, slots,
+    venue_name:fd.get("venue_name"), venue_type:fd.get("venue_type"),
+    lat:fd.get("lat"), lon:fd.get("lon"),
+    address:fd.get("address")||null,
+    is_free: fd.get("is_free")==="on", cost:fd.get("is_free")==="on"?null:(fd.get("cost")||null),
+    food:[...newform.querySelectorAll('input[name="food"]:checked')].map(i=>i.value),
+    food_note:fd.get("food_note")||null,
+    discounts,
+    description:fd.get("description")||null,
+    contacts,
+    contact_email:fd.get("contact_email"),
+    copyright_declared: fd.get("copyright_declared")==="on",
+    poster_path: fd.get("poster_path")||null,
+  };
+  const editing=editingId;
+  const url = ADMIN_API_BASE + (editing ? "/api/update" : "/api/create");
+  if(editing) payload.id = editing;
+  const r=await fetch(url,{method:"POST",headers:authHeaders({"Content-Type":"application/json"}),
+    body:JSON.stringify(payload)});
+  if(r.status===401){ setToken(null); setLogged(false); return; }
+  const d=await r.json();
+  if(!r.ok){ modalErr.textContent=d.error||"Errore"; modalErr.classList.add("show"); return; }
+  closeModal();
+  if(editing){ toast("Modifiche salvate"); load(); }
+  else {
+    toast("Evento creato · in coda per la moderazione");
+    document.querySelector('.tab[data-status="pending"]').click();
+  }
+});
+
+checkSession();
+</script>
+</body>
+</html>
