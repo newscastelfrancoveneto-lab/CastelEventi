@@ -273,12 +273,12 @@
 </div>
 
 <script>
-// Pagina statica (puo' stare su Pages): l'API resta sul Pi, raggiungibile solo in
-// tailnet. Senza un token valido (rilasciato da /api/admin/login) questa pagina non
-// puo' fare nulla — e' per questo che puo' essere pubblica senza rischio.
-// RUNBOOK §5: valorizzare con l'URL tailnet quando noto, es. "https://<macchina>.<tailnet>.ts.net:8090"
+// Pagina statica (puo' stare su Pages): l'API e' sul Pi, esposta via Funnel come il
+// submit (pattern CastelSafe — pubblica ma protetta da password + rate-limit + token,
+// NON isolata in tailnet). Senza un token valido (rilasciato da /api/admin/login)
+// questa pagina non puo' fare nulla.
 const ADMIN_API_BASE = (location.hostname==="localhost"||location.hostname==="127.0.0.1")
-  ? "http://127.0.0.1:8090" : "https://andrea.tail04be23.ts.net:9443";
+  ? "http://127.0.0.1:8090" : "https://andrea.tail04be23.ts.net:8444";
 const TOKEN_KEY = "ce_admin_token";
 function getToken(){ return sessionStorage.getItem(TOKEN_KEY); }
 function setToken(v){ if(v) sessionStorage.setItem(TOKEN_KEY, v); else sessionStorage.removeItem(TOKEN_KEY); }
@@ -320,7 +320,7 @@ document.getElementById("loginform").addEventListener("submit",async e=>{
     setToken(d.token);
     setLogged(true);
   }catch(_){
-    loginErr.textContent="Server non raggiungibile (sei nella tailnet?).";
+    loginErr.textContent="Server non raggiungibile (Pi spento o Funnel giu'?).";
     loginErr.style.display="block";
   }
 });
