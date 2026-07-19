@@ -442,12 +442,22 @@ function localDateKey(d){
 }
 function fmtTime(iso){ const d=new Date(iso); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
 
-// espande ogni evento nei suoi slot-giorno: è così che "cosa c'è oggi" e la mappa restano possibili
+// espande ogni evento nei suoi slot-giorno: è così che "cosa c'è oggi" e la mappa restano possibili.
+// Uno slot puo' coprire piu' giorni (es. una mostra dal 27 giugno al 23 agosto, un solo slot
+// con start/end lontani): resta un elemento PER OGNI giorno coperto, cosi' non sparisce dalla
+// lista/calendario/mappa il giorno dopo l'inizio pur durando settimane. Cap di sicurezza a 180
+// giorni per non esplodere se qualcuno inserisce per sbaglio un anno di fine sbagliato.
 function expand(events){
   const out=[];
   for(const e of events){
     for(const s of e.slots){
-      out.push({ev:e, slot:s, key:dayKey(s.start), sort:new Date(s.start).getTime()});
+      const cur=new Date(s.start); cur.setHours(0,0,0,0);
+      const endDay=new Date(s.end); endDay.setHours(0,0,0,0);
+      const startMs=new Date(s.start).getTime();
+      for(let guard=0; cur<=endDay && guard<180; guard++){
+        out.push({ev:e, slot:s, key:localDateKey(cur), sort:guard===0?startMs:cur.getTime()});
+        cur.setDate(cur.getDate()+1);
+      }
     }
   }
   return out.sort((a,b)=>a.sort-b.sort);
@@ -686,8 +696,10 @@ function buildMapMarkers(){
 
   const groups=new Map(); // "lat,lon" -> {isToday, events:Set}
   for(const ev of DATA.events){
-    const keys=ev.slots.map(s=>dayKey(s.start));
-    const isToday=keys.includes(todayKey), isUpcoming=keys.some(k=>k>todayKey);
+    // uno slot puo' coprire piu' giorni (mostra di settimane): "oggi" se oggi cade dentro
+    // [start,end] di uno slot, non solo se lo slot INIZIA oggi.
+    const isToday=ev.slots.some(s=>dayKey(s.start)<=todayKey && dayKey(s.end)>=todayKey);
+    const isUpcoming=ev.slots.some(s=>dayKey(s.start)>todayKey);
     if(!isToday && !isUpcoming) continue;   // evento del tutto passato: non va in mappa
     if(isToday && !mapLegendState.today && !(isUpcoming && mapLegendState.upcoming)) continue;
     if(!isToday && isUpcoming && !mapLegendState.upcoming) continue;
