@@ -278,7 +278,7 @@
 // NON isolata in tailnet). Senza un token valido (rilasciato da /api/admin/login)
 // questa pagina non puo' fare nulla.
 const ADMIN_API_BASE = (location.hostname==="localhost"||location.hostname==="127.0.0.1")
-  ? "http://127.0.0.1:8090" : "https://andrea.tail04be23.ts.net:8444";
+  ? "http://127.0.0.1:8090" : "https://andrea.tail04be23.ts.net:10000";
 const TOKEN_KEY = "ce_admin_token";
 function getToken(){ return sessionStorage.getItem(TOKEN_KEY); }
 function setToken(v){ if(v) sessionStorage.setItem(TOKEN_KEY, v); else sessionStorage.removeItem(TOKEN_KEY); }
