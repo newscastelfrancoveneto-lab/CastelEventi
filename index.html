@@ -90,8 +90,8 @@
   .w-sun-rays{transform-box:fill-box;transform-origin:center;animation:w-sun-spin 20s linear infinite}
   @keyframes w-sun-pulse{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.1);filter:brightness(1.12)}}
   @keyframes w-sun-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-  .w-moon-core{transform-origin:center;animation:w-moon-glow 4s ease-in-out infinite}
-  @keyframes w-moon-glow{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.05);filter:brightness(1.15)}}
+  .w-moon-core{transform-box:fill-box;transform-origin:center;animation:w-moon-float 4s ease-in-out infinite}
+  @keyframes w-moon-float{0%,100%{transform:translateY(0) scale(1);filter:brightness(1)}50%{transform:translateY(-2.5px) scale(1.05);filter:brightness(1.15)}}
   .w-star{animation:w-star-twinkle 2.2s ease-in-out infinite;transform-origin:center}
   @keyframes w-star-twinkle{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
   .w-cloud-top{animation:w-cloud-top-sway 3.4s ease-in-out infinite;transform-origin:center}
