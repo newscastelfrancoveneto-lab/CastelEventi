@@ -184,19 +184,19 @@
     <p>Controlla la tua email per confermare: senza conferma la proposta non entra in coda.</p>
     <div class="devlink" id="devlink"></div>
     <p style="margin-top:22px"><a class="submitbtn" style="display:inline-block;text-decoration:none;width:auto;padding:11px 24px"
-      href="http://127.0.0.1:8080/">Torna alla pagina principale</a></p>
+      href="./index.html">Torna alla pagina principale</a></p>
   </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9/dist/leaflet.js"></script>
 <script>
 // Il sito e' statico (GitHub Pages): il POST di submit deve raggiungere il Pi via
-// Tailscale Funnel, che e' un'origine diversa. In locale (servito da submit_server.py
-// sulla stessa porta) resta "" cosi' la fetch e' same-origin come oggi.
-// RUNBOOK §5: valorizzare con l'URL Funnel non appena noto, es.
-// "https://<macchina>.<tailnet>.ts.net"
-const SUBMIT_API_BASE = location.hostname==="localhost"||location.hostname==="127.0.0.1"
-  ? "" : "https://andrea.tail04be23.ts.net:8443";
+// Tailscale Funnel, che e' un'origine diversa da qualunque pagina lo serva (Pages o,
+// in locale, il server pubblico read-only sulla 8080). Esplicito in entrambi i casi,
+// stesso pattern di PI_BASE/ADMIN_API_BASE — cosi' submit.html puo' essere linkata
+// come pagina relativa ovunque, senza dipendere da quale server la sta servendo.
+const SUBMIT_API_BASE = (location.hostname==="localhost"||location.hostname==="127.0.0.1")
+  ? "http://127.0.0.1:8091" : "https://andrea.tail04be23.ts.net:8443";
 
 const DOW=["Dom","Lun","Mar","Mer","Gio","Ven","Sab"];
 let TOWN_BBOX=[45.650,11.905,45.690,11.950]; // fallback; sovrascritto da /events.json
