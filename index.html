@@ -91,7 +91,7 @@
   @keyframes w-sun-pulse{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.1);filter:brightness(1.12)}}
   @keyframes w-sun-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
   .w-moon-core{transform-origin:center}
-  .w-star{animation:w-star-twinkle 2.2s ease-in-out infinite;transform-origin:center}
+  .w-star{transform-box:fill-box;transform-origin:center;animation:w-star-twinkle 2.2s ease-in-out infinite}
   @keyframes w-star-twinkle{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
   .w-cloud-top{animation:w-cloud-top-sway 3.4s ease-in-out infinite;transform-origin:center}
   @keyframes w-cloud-top-sway{0%,100%{transform:translateX(-1.6px)}50%{transform:translateX(1.6px)}}
