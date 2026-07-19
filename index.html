@@ -241,14 +241,13 @@
   .cal-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;
     gap:10px;margin-bottom:16px;padding-right:34px}
   .cal-nav{display:flex;align-items:center;gap:10px}
-  .cal-nav #cal-today{flex-shrink:0;padding-right:16px}
-  .cal-nav button{border:1.5px solid var(--line);background:#fff;width:30px;height:30px;
-    border-radius:2px;cursor:pointer;font-size:16px;line-height:1}
-  .cal-nav button:hover{border-color:var(--ink-soft)}
+  .cal-nav .cal-arrow{border:1.5px solid var(--line);background:#fff;width:30px;height:30px;
+    border-radius:2px;cursor:pointer;font-size:16px;line-height:1;flex-shrink:0}
+  .cal-nav .cal-arrow:hover{border-color:var(--ink-soft)}
   .cal-title{font-family:ui-serif,Georgia,serif;font-size:19px;font-weight:600;min-width:160px;text-align:center}
   .cal-views{display:flex;gap:6px}
   .cal-view-btn,#cal-today{font:inherit;font-size:12px;border:1.5px solid var(--line);background:#fff;
-    color:var(--ink-soft);padding:6px 11px;border-radius:100px;cursor:pointer;white-space:nowrap}
+    color:var(--ink-soft);padding:6px 11px;border-radius:100px;cursor:pointer;white-space:nowrap;flex-shrink:0}
   .cal-view-btn[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 
   .cal-month{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--line);
@@ -375,9 +374,9 @@
     <button class="modal-close" id="calendar-close" aria-label="Chiudi">×</button>
     <div class="cal-header">
       <div class="cal-nav">
-        <button type="button" id="cal-prev" aria-label="Precedente">‹</button>
+        <button type="button" class="cal-arrow" id="cal-prev" aria-label="Precedente">‹</button>
         <span class="cal-title" id="cal-title"></span>
-        <button type="button" id="cal-next" aria-label="Successivo">›</button>
+        <button type="button" class="cal-arrow" id="cal-next" aria-label="Successivo">›</button>
         <button type="button" id="cal-today">Oggi</button>
       </div>
       <div class="cal-views" id="cal-views">
