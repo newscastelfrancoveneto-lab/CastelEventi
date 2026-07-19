@@ -240,6 +240,17 @@
   .b{font-size:11px;padding:2px 8px;border-radius:100px;border:1px solid var(--line)}
   .b.free{color:var(--free);border-color:var(--free)}
   .b.food{color:var(--moat);border-color:var(--moat)}
+  .poster-btn{padding:0;border:none;background:none;cursor:zoom-in;display:block;border-radius:2px}
+  .card-share{margin-left:auto;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    width:26px;height:26px;padding:0;border:1px solid var(--line);border-radius:100px;
+    background:#fff;color:var(--ink-soft);cursor:pointer}
+  .card-share:hover{color:var(--brick);border-color:var(--brick)}
+  .card-share .icon{width:14px;height:14px}
+  .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(8px);
+    background:var(--ink);color:#fff;padding:8px 16px;border-radius:100px;font-size:13px;
+    opacity:0;pointer-events:none;transition:.18s;z-index:80;white-space:nowrap;max-width:90vw;
+    overflow:hidden;text-overflow:ellipsis}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
   /* popup evento */
   .modal-overlay{position:fixed;inset:0;background:rgba(27,24,21,.62);z-index:50;
@@ -369,6 +380,8 @@
         style="background:transparent;color:var(--brick)">Modifica il tuo evento</a>
       <a class="propose-btn" href="./admin.html"
         style="background:transparent;color:var(--brick)">Accesso staff</a>
+      <button type="button" class="propose-btn" id="share-page-btn"
+        style="background:transparent;color:var(--brick)">Condividi</button>
     </div>
   </header>
 
@@ -463,6 +476,42 @@ const ICON_PATHS = {
 function icon(name){
   return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON_PATHS[name]}</svg>`;
+}
+{
+  const btn=document.getElementById("share-page-btn");
+  if(btn){ btn.innerHTML=icon("share")+" Condividi"; btn.addEventListener("click",()=>sharePage()); }
+}
+
+// ---- condivisione: Web Share API se disponibile, altrimenti copia link + toast ----
+function showToast(msg){
+  let t=document.getElementById("toast");
+  if(!t){
+    t=document.createElement("div"); t.id="toast"; t.className="toast";
+    document.body.appendChild(t);
+  }
+  t.textContent=msg; t.classList.add("show");
+  clearTimeout(t._hideTimer);
+  t._hideTimer=setTimeout(()=>t.classList.remove("show"),2200);
+}
+async function shareUrl(title,url){
+  if(navigator.share){
+    try{ await navigator.share({title, url}); return; }catch(_){ return; }   // utente ha annullato: nessun errore da mostrare
+  }
+  try{
+    await navigator.clipboard.writeText(url);
+    showToast("Link copiato negli appunti");
+  }catch(_){
+    showToast(url);
+  }
+}
+function shareEvent(e){
+  shareUrl(e.title, `${location.origin}${location.pathname}#ev-${e.id}`);
+}
+function sharePage(){
+  shareUrl("News Castelfranco — Eventi", `${location.origin}${location.pathname}`);
+}
+function openPosterFull(url){
+  window.open(url,"_blank","noopener");
 }
 
 // ---- STEP 1: dati serviti da events.json (qui inline come fallback per l'anteprima) ----
@@ -562,11 +611,11 @@ function render(){
 }
 
 function cardEl(e,slot){
-  const el=document.createElement("button");
-  el.className="card"; el.type="button";
+  const el=document.createElement("div");
+  el.className="card"; el.setAttribute("role","button"); el.tabIndex=0;
   el.dataset.eventId=e.id;
   const posterSm = e.poster_thumb
-    ? `<img class="poster-sm" src="${POSTER_BASE}/posters/${esc(e.poster_thumb)}" alt="">`
+    ? `<button type="button" class="poster-btn" aria-label="Ingrandisci locandina"><img class="poster-sm" src="${POSTER_BASE}/posters/${esc(e.poster_thumb)}" alt=""></button>`
     : `<div class="poster-sm ph">n/d</div>`;
   const FOOD_LABEL={rinfresco:"Rinfresco",bar:"Bar",cucina:"Cucina"};
   const foodBadges = (e.food||[]).map(f=>`<span class="b food">${FOOD_LABEL[f]||f}</span>`).join("");
@@ -580,9 +629,21 @@ function cardEl(e,slot){
       <span class="s-title">${esc(e.title)}</span>
       <span class="s-time">${fmtTime(slot.start)}–${fmtTime(slot.end)}</span>
       <span class="s-venue">${esc(e.venue_name)}</span>
-      <div class="badges">${freeBadge}${foodBadges}${venueBadge}</div>
+      <div class="badges">${freeBadge}${foodBadges}${venueBadge}
+        <button type="button" class="card-share" aria-label="Condividi evento">${icon("share")}</button>
+      </div>
     </div>`;
   el.addEventListener("click",()=>openModal(e));
+  el.addEventListener("keydown",ev=>{ if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); openModal(e); } });
+  const posterBtn=el.querySelector(".poster-btn");
+  if(posterBtn) posterBtn.addEventListener("click",ev=>{
+    ev.stopPropagation();
+    openPosterFull(`${POSTER_BASE}/posters/${esc(e.poster)}`);
+  });
+  el.querySelector(".card-share").addEventListener("click",ev=>{
+    ev.stopPropagation();
+    shareEvent(e);
+  });
   return el;
 }
 
@@ -610,7 +671,7 @@ function mapsUrl(e){
 
 function openModal(e){
   const poster = e.poster
-    ? `<img class="modal-poster" src="${POSTER_BASE}/posters/${esc(e.poster)}" alt="Locandina">`
+    ? `<button type="button" class="poster-btn" style="width:100%" aria-label="Ingrandisci locandina"><img class="modal-poster" src="${POSTER_BASE}/posters/${esc(e.poster)}" alt="Locandina"></button>`
     : `<div class="modal-poster ph">senza locandina</div>`;
   const FOOD_LABEL={rinfresco:"Rinfresco",bar:"Bar",cucina:"Cucina"};
   const foodBadges = (e.food||[]).map(f=>`<span class="b food">${FOOD_LABEL[f]||f}</span>`).join("");
@@ -667,10 +728,14 @@ function openModal(e){
       <div class="modal-actions">
         <a class="modal-action" target="_blank" rel="noopener" href="${mapsUrl(e)}">${icon("pin")} Apri in Google Maps</a>
         ${calButtons}
+        <button type="button" class="modal-action" id="modal-share">${icon("share")} Condividi</button>
       </div>
     </div>`;
   document.getElementById("modal-overlay").classList.add("show");
   history.replaceState(null,"","#ev-"+e.id);
+  const posterBtn=document.querySelector("#modal-content .poster-btn");
+  if(posterBtn) posterBtn.addEventListener("click",()=>openPosterFull(`${POSTER_BASE}/posters/${esc(e.poster)}`));
+  document.getElementById("modal-share").addEventListener("click",()=>shareEvent(e));
 }
 function closeModal(){
   document.getElementById("modal-overlay").classList.remove("show");
