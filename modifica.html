@@ -212,7 +212,7 @@
 const SUBMIT_API_BASE = (location.hostname==="localhost"||location.hostname==="127.0.0.1")
   ? "http://127.0.0.1:8091" : "https://andrea.tail04be23.ts.net:8443";
 
-let TOWN_BBOX=[45.650,11.905,45.690,11.950];
+let TOWN_BBOX=[45.630,11.860,45.715,11.995];
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
 
 let currentEvent=null;   // riempito dopo il login (email+codice)

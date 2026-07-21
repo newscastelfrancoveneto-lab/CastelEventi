@@ -217,7 +217,7 @@ const SUBMIT_API_BASE = (location.hostname==="localhost"||location.hostname==="1
   ? "http://127.0.0.1:8091" : "https://andrea.tail04be23.ts.net:8443";
 
 const DOW=["Dom","Lun","Mar","Mer","Gio","Ven","Sab"];
-let TOWN_BBOX=[45.650,11.905,45.690,11.950]; // fallback; sovrascritto da /events.json
+let TOWN_BBOX=[45.630,11.860,45.715,11.995]; // fallback; sovrascritto da /events.json
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
 
 function slotRow(){

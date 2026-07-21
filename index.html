@@ -535,7 +535,7 @@ function openPosterFull(url){
 // Lo schema qui sotto è quello BLOCCATO. Nota `slots`: un evento multi-giorno = UNA riga.
 // Nessun dato finto: se il Pi/Funnel non risponde, meglio dirlo chiaramente
 // (vedi RUNBOOK §6.5) che mostrare eventi di esempio spacciati per reali.
-const FALLBACK = { town_bbox:[45.650,11.905,45.690,11.950], events: [] };
+const FALLBACK = { town_bbox:[45.630,11.860,45.715,11.995], events: [] };
 let dataLoadFailed = false;
 
 const CAT_LABEL = {sagra:"Sagra",concerto:"Concerto",cultura:"Cultura",sport:"Sport",mercato:"Mercato",altro:"Altro"};
@@ -884,7 +884,7 @@ document.getElementById("map-toggle").addEventListener("click",()=>{
   document.getElementById("map-legend").style.display = open?"flex":"none";
   if(open){
     if(!leafletMap){
-      const [minlat,minlon,maxlat,maxlon]=(DATA.town_bbox)||[45.650,11.905,45.690,11.950];
+      const [minlat,minlon,maxlat,maxlon]=(DATA.town_bbox)||[45.630,11.860,45.715,11.995];
       leafletMap=L.map("map",{scrollWheelZoom:false}).fitBounds([[minlat,minlon],[maxlat,maxlon]]);
       // ctrl+rotellina per zoomare (niente scroll-jacking accidentale); pinch da telefono gia' attivo di default
       leafletMap.getContainer().addEventListener("wheel", ev=>{
